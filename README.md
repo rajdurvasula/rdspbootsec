@@ -13,7 +13,7 @@ spring boot application with native form login
   - Refer: scripts/database.sql 
 
 ## Setup Application Instance/VM
-- If using AWS Account, use the CloudFormation Template file: **scripts/app_vm.yaml
+- If using AWS Account, use the CloudFormation Template file: **scripts/app_vm.yaml**
 - If installation on any other environment, follow below steps:
   - Install JDK 1.8.x
   - Install Maven 3.5.2
