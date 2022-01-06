@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Launch RHEL7 Instance with cfn-init
+Parameters:
+  AMIParam:
+    Type: String
+    Description: AMI ID
+  VPCParam:
+    Type: AWS::EC2::VPC::Id
+    Description: Select VPC
+  SubnetParam:
+    Type: AWS::EC2::Subnet::Id
+    Description: Select Subnet
+  SGParam:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Select Security Group
+  KeyPairParam:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Select KeyPair
+Resources:
+  AppInstance:
+    Type: AWS::EC2::Instance
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT10M
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          prereqs:
+            - install_config_prereqs
+            - install_java
+            - install_maven
+        install_config_prereqs:
+          files:
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+              mode: '000400'
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.AppInstance.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource AppInstance --configsets prereqs --region ${AWS::Region}
+              mode: '000400'
+              owner: root
+              group: root
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: true
+                ensureRunning: true
+                files:
+                  - /etc/cfn/cfn-hup.conf
+                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+        install_java:
+          commands:
+            01_install_java:
+              command: !Sub |
+                #!/bin/bash -x
+                yum -y install java-1.8.0-openjdk-devel
+        install_maven:
+          commands:
+            01_install_maven:
+              command: !Sub |
+                #!/bin/bash -x
+                wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+                sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+                yum -y install apache-maven
+    Properties:
+      ImageId: !Ref AMIParam
+      InstanceType: t2.micro
+      KeyName: !Ref KeyPairParam
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: '0'
+          GroupSet:
+            - !Ref SGParam
+          SubnetId: !Ref SubnetParam
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -x
+          yum -y update
+          yum -y install aws-cfn-bootstrap
+          yum -y update aws-cfn-bootstrap
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource AppInstance --configsets prereqs --region ${AWS::Region}
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource AppInstance --region ${AWS::Region}
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-app'
+
