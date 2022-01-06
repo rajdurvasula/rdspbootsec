@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Car Sellers by Make</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="../css/shards.min.css"> -->
+</head>
+<body>
+    <div class="container my-2">
+        <button type="button" class="btn btn-success" th:onclick="|window.location.href='/'|">Done</button>
+        <div class="card">
+            <div class="card-body">
+                <div th:switch="${carDetailsList}" class="container my-5">
+                   <div class="col-md-10">
+                       <div th:case="*">
+                            <table class="table table-striped table-responsive-md">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th><a th:href="@{'/carsales/searchsellers/'+${currentPage}+'?sortField=seller&sortDir='+${reverseSortDir}+'&make='+${make}}">Seller</a></th>
+                                        <th>Color</th>
+                                        <th>Interior</th>
+                                        <th>Sale Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="carDetails : ${carDetailsList}">
+                                        <td th:text="${carDetails.id}"></td>
+                                        <td th:text="${carDetails.seller}"></td>
+                                        <td th:text="${carDetails.color}"></td>
+                                        <td th:text="${carDetails.interior}"></td>
+                                        <td th:text="${carDetails.salePrice}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div th:if="${totalPages > 1}">
+                                <div class="row col-sm-10">
+                                    <div class="col-sm-2">
+                                        Total Rows: [[${totalItems}]]
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                                            <a th:if="${currentPage != i}" th:href="@{'/carsales/searchsellers/'+${i}+'?sortField='+${sortField}+'&sortDir='+${sortDir}+'&make='+${make}}">
+                                                [[${i}]]
+                                            </a>
+                                            <span th:unless="${currentPage != i}">[[${i}]]</span>   &nbsp; &nbsp;
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <a th:if="${currentPage < totalPages}" th:href="@{'/carsales/searchsellers/'+${currentPage + 1}+'?sortField='+${sortField}+'&sortDir='+${sortDir}+'&make='+${make}}">
+                                            Next
+                                        </a>
+                                        <span th:unless="${currentPage < totalPages}">Next</span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <a th:if="${currentPage < totalPages}" th:href="@{'/carsales/searchsellers/'+${totalPages}+'?sortField='+${sortField}+'&sortDir='+${sortDir}+'&make='+${make}}">Last</a>
+                                        <span th:unless="${currentPage < totalPages}">Last</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>  
+</html>

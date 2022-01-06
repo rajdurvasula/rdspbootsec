@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Search Sellers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="../css/shards.min.css"> -->
+</head>
+<body>
+    <div layout:fragment="content">
+        <section class="my-5">
+            <div class="container my-2">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="form-horizontal" id="search-sellers" th:action="@{/carsales/searchsellers/1}" method="post" th:object="${searchSellers}">
+                            <div class="form-group form-group-lg">
+                                <label class="col-sm-2 control-label">Choose Make</label>
+                                <select class="form-control selectpicker" th:field="*{make}">
+                                    <option value="">Not Selected</option>
+                                    <option th:each="m : ${makes}" th:value="${m}" th:text="${m}"/>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" type="submit">Submit form</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>  
+</html>

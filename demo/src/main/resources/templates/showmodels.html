@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Car Models by Maker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="../css/shards.min.css"> -->
+</head>
+<body>
+    <div class="container my-2">
+        <button type="button" class="btn btn-success" th:onclick="|window.location.href='/'|">Done</button>
+        <div class="card">
+            <div class="card-body">
+                <div th:switch="${makermodels}" class="container my-5">
+                   <div class="col-md-10">
+                       <div th:case="*">
+                            <table class="table table-striped table-responsive-md">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th><a th:href="@{'/carsales/searchmodels/'+${currentPage}+'?sortField=modelName&sortDir='+${reverseSortDir}+'&maker='+${maker}}">Model</a></th>
+                                        <th>Year</th>
+                                        <th>Trim</th>
+                                        <th>Type</th>
+                                        <th>Transmission</th>
+                                        <th>vin</th>
+                                        <th>Select</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="makermodel : ${makermodels}">
+                                        <td th:text="${makermodel.id}"></td>
+                                        <td th:text="${makermodel.modelName}"></td>
+                                        <td th:text="${makermodel.makeYear}"></td>
+                                        <td th:text="${makermodel.modelTrim}"></td>
+                                        <td th:text="${makermodel.modelType}"></td>
+                                        <td th:text="${makermodel.transmission}"></td>
+                                        <td th:text="${makermodel.vin}"></td>
+                                        <td><a th:href="@{/carsales/addfavorite/{vin}(vin=${makermodel.vin})}" class="btn btn-primary"><i class="fas fa-user-edit ml-2"></i></a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div th:if="${totalPages > 1}">
+                                <div class="row col-sm-10">
+                                    <div class="col-sm-2">
+                                        Total Rows: [[${totalItems}]]
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <span th:each="i : ${#numbers.sequence(1, totalPages)}">
+                                            <a th:if="${currentPage != i}" th:href="@{'/carsales/searchmodels/'+${i}+'?sortField='+${sortField}+'&sortDir='+${sortDir}+'&maker='+${maker}}">
+                                                [[${i}]]
+                                            </a>
+                                            <span th:unless="${currentPage != i}">[[${i}]]</span>   &nbsp; &nbsp;
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <a th:if="${currentPage < totalPages}" th:href="@{'/carsales/searchmodels/'+${currentPage + 1}+'?sortField='+${sortField}+'&sortDir='+${sortDir}+'&maker='+${maker}}">
+                                            Next
+                                        </a>
+                                        <span th:unless="${currentPage < totalPages}">Next</span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <a th:if="${currentPage < totalPages}" th:href="@{'/carsales/searchmodels/'+${totalPages}+'?sortField='+${sortField}+'&sortDir='+${sortDir}+'&maker='+${maker}}">Last</a>
+                                        <span th:unless="${currentPage < totalPages}">Last</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>  
+</html>
